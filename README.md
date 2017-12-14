@@ -1,9 +1,9 @@
-[![Build Status](https://travis-ci.org/arowM/haskell-ochinchin-daicho.svg?branch=master)](https://travis-ci.org/arowM/haskell-ochinchin-daicho)
-[![Hackage](https://img.shields.io/hackage/v/ochinchin-daicho.svg)](https://hackage.haskell.org/package/ochinchin-daicho)
-[![Stackage LTS](http://stackage.org/package/ochinchin-daicho/badge/lts)](http://stackage.org/lts/package/ochinchin-daicho)
-[![Stackage Nightly](http://stackage.org/package/ochinchin-daicho/badge/nightly)](http://stackage.org/nightly/package/ochinchin-daicho)
+[![Build Status](https://travis-ci.org/arowM/haskell-ochintin-daicho.svg?branch=master)](https://travis-ci.org/arowM/haskell-ochintin-daicho)
+[![Hackage](https://img.shields.io/hackage/v/ochintin-daicho.svg)](https://hackage.haskell.org/package/ochintin-daicho)
+[![Stackage LTS](http://stackage.org/package/ochintin-daicho/badge/lts)](http://stackage.org/lts/package/ochintin-daicho)
+[![Stackage Nightly](http://stackage.org/package/ochintin-daicho/badge/nightly)](http://stackage.org/nightly/package/ochintin-daicho)
 
-# Haskell-ochinchin-daicho
+# Haskell-ochintin-daicho
 
 A module to manage payroll books for Japanese companies.
 
