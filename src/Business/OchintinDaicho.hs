@@ -37,10 +37,24 @@ module Business.OchintinDaicho
   ) where
 
 import Business.Bookkeeping
-       (Amount(..), Category(..), CategoryType(..), CreditCategory(..), Date(..),
-        DateTransactions, DebitCategory(..), Month(..), Transaction,
-        Transactions, Year(..), activity, dateTrans, month, runTransactions, tAmount,
-        year)
+  ( Amount
+  , Category(..)
+  , CategoryType(..)
+  , CreditCategory(..)
+  , Date
+  , DateTransactions
+  , DebitCategory(..)
+  , Month
+  , Transaction
+  , Transactions
+  , Year
+  , activity
+  , dateTrans
+  , month
+  , runTransactions
+  , tAmount
+  , year
+  )
 import Control.Monad (forM_)
 import Data.Monoid ((<>))
 import Data.Text (Text)
@@ -235,7 +249,7 @@ ppr Person {..} y = do
   T.putStrLn ""
   T.putStrLn . T.concat $
     [ "== "
-    , tshow . unYear $ y
+    , tshowIntegral $ y
     , "年支給分 =="
     ]
   T.putStrLn ""
@@ -247,20 +261,20 @@ ppr Person {..} y = do
       _非課税支給額総計' = _非課税支給額総計 payment
       _その他控除総計' = _その他控除総計 payment
       _実支払額' = _実支払額 payment
-    T.putStrLn $ "支給日: " <> (tshow . unMonth) m <> "月" <> (tshow . unDate) d <> "日"
-    T.putStrLn $ "賃金計算期間: " <> (tshow . unYear) targetYear <> "年" <> (tshow . unMonth) targetMonth <> "月"
+    T.putStrLn $ "支給日: " <> tshowIntegral m <> "月" <> tshowIntegral d <> "日"
+    T.putStrLn $ "賃金計算期間: " <> tshowIntegral targetYear <> "年" <> tshowIntegral targetMonth <> "月"
     T.putStrLn $ "労働日数: " <> tshow _労働日数 <> "日"
-    T.putStrLn $ "労働時間数: " <> (tshowIntegral) _労働時間数 <> "時間"
-    T.putStrLn $ "休日労働時間数: " <> (tshowIntegral) _休日労働時間数 <> "時間"
-    T.putStrLn $ "早出残業時間数: " <> (tshowIntegral) _早出残業時間数 <> "時間"
-    T.putStrLn $ "深夜労働時間数: " <> (tshowIntegral) _深夜労働時間数 <> "時間"
-    T.putStrLn $ "課税支給額: " <> (tshow . unAmount) _課税支給額 <> "円"
-    T.putStrLn $ "控除社会保険料: " <> (tshow . unAmount) _算出保険料' <> "円"
-    T.putStrLn $ "社会保険料等控除の金額: " <> (tshow . unAmount) (_課税支給額 - _算出保険料') <> "円"
-    T.putStrLn $ "所得税額: " <> (tshow . unAmount) _算出所得税' <> "円"
-    T.putStrLn $ "非課税支給額: " <> (tshow . unAmount) _非課税支給額総計' <> "円"
-    T.putStrLn $ "その他控除: " <> (tshow . unAmount) _その他控除総計' <> "円"
-    T.putStrLn $ "--> 実支払額: " <> (tshow . unAmount) _実支払額' <> "円"
+    T.putStrLn $ "労働時間数: " <> tshowIntegral _労働時間数 <> "時間"
+    T.putStrLn $ "休日労働時間数: " <> tshowIntegral _休日労働時間数 <> "時間"
+    T.putStrLn $ "早出残業時間数: " <> tshowIntegral _早出残業時間数 <> "時間"
+    T.putStrLn $ "深夜労働時間数: " <> tshowIntegral _深夜労働時間数 <> "時間"
+    T.putStrLn $ "課税支給額: " <> tshowIntegral _課税支給額 <> "円"
+    T.putStrLn $ "控除社会保険料: " <> tshowIntegral _算出保険料' <> "円"
+    T.putStrLn $ "社会保険料等控除の金額: " <> tshowIntegral (_課税支給額 - _算出保険料') <> "円"
+    T.putStrLn $ "所得税額: " <> tshowIntegral _算出所得税' <> "円"
+    T.putStrLn $ "非課税支給額: " <> tshowIntegral _非課税支給額総計' <> "円"
+    T.putStrLn $ "その他控除: " <> tshowIntegral _その他控除総計' <> "円"
+    T.putStrLn $ "--> 実支払額: " <> tshowIntegral _実支払額' <> "円"
     T.putStrLn ""
 
 {-|
@@ -382,7 +396,7 @@ toBookkeeping Person {..} y debit credit =
         _その他控除総計' = _その他控除総計 payment
         _実支払額' = _実支払額 payment
       month m $
-        activity d (fromString $ (show . unMonth) targetMonth <> "月度") $ do
+        activity d (fromString $ (show . toInteger) targetMonth <> "月度") $ do
           _非課税支給額 credit
           _控除社会保険料 debit _課税支給額
           _所得税額 debit (_課税支給額 - _算出保険料')
@@ -430,7 +444,7 @@ tshow = T.pack . show
 
 
 tshowIntegral :: (Integral a) => a -> T.Text
-tshowIntegral a = T.pack . show $ (fromIntegral a :: Int)
+tshowIntegral = T.pack . show . toInteger
 
 
 dummyDebit :: DebitCategory

@@ -18,8 +18,8 @@ library
   hs-source-dirs:      src
   exposed-modules:     Business.OchintinDaicho
   build-depends:       base >= 4.9 && < 5
-                     , bookkeeping >= 0.2.1.4
-                     , text >= 1.2.2.1
+                     , bookkeeping >= 0.3.3 && < 0.4
+                     , text >= 1.2 && < 1.3
   default-language:    Haskell2010
   ghc-options:         -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates
   default-extensions:  OverloadedStrings
