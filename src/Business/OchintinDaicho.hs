@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE Strict #-}
 {-# LANGUAGE StrictData #-}
@@ -45,7 +46,11 @@ import Business.Bookkeeping
   , DateTransactions
   , DebitCategory(..)
   , Month
+#if MIN_VERSION_bookkeeping(0,4,0)
+  , Journal
+#else
   , Transaction
+#endif
   , Transactions
   , Year
   , activity
@@ -468,5 +473,9 @@ _その他控除総計 Payment {..} = sum . map tAmount . runDummyActivity $ _�
 _実支払額 :: Payment -> Amount
 _実支払額 payment@(Payment {..}) = _課税支給額 - _算出保険料 payment - _算出所得税 payment - _その他控除総計 payment + _非課税支給額総計 payment
 
+#if MIN_VERSION_bookkeeping(0,4,0)
+runDummyActivity :: DateTransactions -> [Journal]
+#else
 runDummyActivity :: DateTransactions -> [Transaction]
+#endif
 runDummyActivity = runTransactions . year 1 . month 1 . activity 1 ""
