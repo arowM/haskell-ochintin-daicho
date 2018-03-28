@@ -78,98 +78,108 @@ let
       2017 -> do
         datePayment 1 10 $
           Payment
-            { _賃金計算期間 = (2016, 12)
-            , _労働日数 = 13
-            , _労働時間数 = 13 * 5
-            , _休日労働時間数 = 0
-            , _早出残業時間数 = 0
-            , _深夜労働時間数 = 0
-            , _課税支給額 = 250000
-            , _控除社会保険料 = \debit amount -> do
-              dateTrans debit
-                (CreditCategory $ Category "預り金" Liabilities)
-                "健康保険料(社員負担分)"
-                $ if (200000 < amount && amount < 300000)
-                  then 15000
-                  else error "undefined 健康保険料"
-              dateTrans debit
-                (CreditCategory $ Category "預り金" Liabilities)
-                "厚生年金(社員負担分)"
-                $ if (200000 < amount && amount < 300000)
-                  then 20000
-                  else error "undefined 厚生年金"
-              dateTrans debit
-                (CreditCategory $ Category "預り金" Liabilities)
-                "雇用保険料(社員負担分)"
-                $ if (200000 < amount && amount < 300000)
-                  then 1000
-                  else error "undefined 雇用保険料"
-            , _所得税額 = \debit amount ->
-              dateTrans debit
-                (CreditCategory $ Category "預り金" Liabilities)
-                "源泉所得税"
-                $ if (200000 < amount && amount < 250000)
-                  then 5000
-                  else error $ "undefined 所得税額 for " <> show amount
-            , _非課税支給額 = \credit -> do
-              dateTrans
-                (DebitCategory $ Category "旅費・交通費" Expenses)
-                credit
-                "立替交通費"
-                3000
-            , _その他控除 = \debit ->
-              dateTrans debit
-                (CreditCategory $ Category "預り金" Liabilities)
-                "親睦会費"
-                5000
-            }
+            ( PaymentMeta
+              { _賃金計算期間 = (2016, 12)
+              , _労働日数 = 13
+              , _労働時間数 = 13 * 5
+              , _休日労働時間数 = 0
+              , _早出残業時間数 = 0
+              , _深夜労働時間数 = 0
+              }
+            )
+            ( PaymentCore
+              { _課税支給額 = 250000
+              , _控除社会保険料 = \debit amount -> do
+                dateTrans debit
+                  (CreditCategory $ Category "預り金" Liabilities)
+                  "健康保険料(社員負担分)"
+                  $ if (200000 < amount && amount < 300000)
+                    then 15000
+                    else error "undefined 健康保険料"
+                dateTrans debit
+                  (CreditCategory $ Category "預り金" Liabilities)
+                  "厚生年金(社員負担分)"
+                  $ if (200000 < amount && amount < 300000)
+                    then 20000
+                    else error "undefined 厚生年金"
+                dateTrans debit
+                  (CreditCategory $ Category "預り金" Liabilities)
+                  "雇用保険料(社員負担分)"
+                  $ if (200000 < amount && amount < 300000)
+                    then 1000
+                    else error "undefined 雇用保険料"
+              , _所得税額 = \debit amount ->
+                dateTrans debit
+                  (CreditCategory $ Category "預り金" Liabilities)
+                  "源泉所得税"
+                  $ if (200000 < amount && amount < 250000)
+                    then 5000
+                    else error $ "undefined 所得税額 for " <> show amount
+              , _非課税支給額 = \credit -> do
+                dateTrans
+                  (DebitCategory $ Category "旅費・交通費" Expenses)
+                  credit
+                  "立替交通費"
+                  3000
+              , _その他控除 = \debit ->
+                dateTrans debit
+                  (CreditCategory $ Category "預り金" Liabilities)
+                  "親睦会費"
+                  5000
+              }
+            )
         datePayment 2 10 $
           Payment
-            { _賃金計算期間 = (2017, 1)
-            , _労働日数 = 12
-            , _労働時間数 = 12 * 5
-            , _休日労働時間数 = 0
-            , _早出残業時間数 = 0
-            , _深夜労働時間数 = 0
-            , _課税支給額 = 250000
-            , _控除社会保険料 = \debit amount -> do
-              dateTrans debit
-                (CreditCategory $ Category "預り金" Liabilities)
-                "健康保険料(社員負担分)"
-                $ if (200000 < amount && amount < 300000)
-                  then 15000
-                  else error "undefined 健康保険料"
-              dateTrans debit
-                (CreditCategory $ Category "預り金" Liabilities)
-                "厚生年金(社員負担分)"
-                $ if (200000 < amount && amount < 300000)
-                  then 20000
-                  else error "undefined 厚生年金"
-              dateTrans debit
-                (CreditCategory $ Category "預り金" Liabilities)
-                "雇用保険料(社員負担分)"
-                $ if (200000 < amount && amount < 300000)
-                  then 1000
-                  else error "undefined 雇用保険料"
-            , _所得税額 = \debit amount ->
-              dateTrans debit
-                (CreditCategory $ Category "預り金" Liabilities)
-                "源泉所得税"
-                $ if (200000 < amount && amount < 250000)
-                  then 5000
-                  else error $ "undefined 所得税額2 for " <> show amount
-            , _非課税支給額 = \credit -> do
-              dateTrans
-                (DebitCategory $ Category "旅費・交通費" Expenses)
-                credit
-                "立替交通費"
-                4000
-            , _その他控除 = \debit ->
-              dateTrans debit
-                (CreditCategory $ Category "預り金" Liabilities)
-                "親睦会費"
-                5000
-            }
+            ( PaymentMeta
+              { _賃金計算期間 = (2017, 1)
+              , _労働日数 = 12
+              , _労働時間数 = 12 * 5
+              , _休日労働時間数 = 0
+              , _早出残業時間数 = 0
+              , _深夜労働時間数 = 0
+              }
+            )
+            ( PaymentCore
+              { _課税支給額 = 250000
+              , _控除社会保険料 = \debit amount -> do
+                dateTrans debit
+                  (CreditCategory $ Category "預り金" Liabilities)
+                  "健康保険料(社員負担分)"
+                  $ if (200000 < amount && amount < 300000)
+                    then 15000
+                    else error "undefined 健康保険料"
+                dateTrans debit
+                  (CreditCategory $ Category "預り金" Liabilities)
+                  "厚生年金(社員負担分)"
+                  $ if (200000 < amount && amount < 300000)
+                    then 20000
+                    else error "undefined 厚生年金"
+                dateTrans debit
+                  (CreditCategory $ Category "預り金" Liabilities)
+                  "雇用保険料(社員負担分)"
+                  $ if (200000 < amount && amount < 300000)
+                    then 1000
+                    else error "undefined 雇用保険料"
+              , _所得税額 = \debit amount ->
+                dateTrans debit
+                  (CreditCategory $ Category "預り金" Liabilities)
+                  "源泉所得税"
+                  $ if (200000 < amount && amount < 250000)
+                    then 5000
+                    else error $ "undefined 所得税額2 for " <> show amount
+              , _非課税支給額 = \credit -> do
+                dateTrans
+                  (DebitCategory $ Category "旅費・交通費" Expenses)
+                  credit
+                  "立替交通費"
+                  4000
+              , _その他控除 = \debit ->
+                dateTrans debit
+                  (CreditCategory $ Category "預り金" Liabilities)
+                  "親睦会費"
+                  5000
+              }
+            )
       _ ->
         pure ()
     }
@@ -183,7 +193,7 @@ Amount {unAmount = 500000}
 -}
 _年度内課税支給金額 :: Person -> Year -> Amount
 _年度内課税支給金額 Person {..} =
-  osum . tMap (_課税支給額 . snd) . payments
+  osum . tMap (_課税支給額 . core . snd) . payments
 
 {-| 対象年度内の社会保険料等控除額総計
 
@@ -253,7 +263,7 @@ ppr Person {..} y = do
     , "年支給分 =="
     ]
   T.putStrLn ""
-  oforM_ (payments y) $ \((m, d), payment@(Payment {..})) -> do
+  oforM_ (payments y) $ \((m, d), payment@(Payment (PaymentMeta {..}) (PaymentCore {..}))) -> do
     let
       (targetYear, targetMonth) = _賃金計算期間
       _算出保険料' = _算出保険料 payment
@@ -387,7 +397,7 @@ tAmount: 208000
 toBookkeeping :: Person -> Year -> DebitCategory -> CreditCategory -> Transactions
 toBookkeeping Person {..} y debit credit =
   year y $
-    oforM_ (payments y) $ \((m, d), payment@(Payment {..})) -> do
+    oforM_ (payments y) $ \((m, d), payment@(Payment (PaymentMeta {..}) (PaymentCore {..}))) -> do
       let
         (_, targetMonth) = _賃金計算期間
         _算出保険料' = _算出保険料 payment
@@ -424,13 +434,21 @@ data Person = Person
 type Payments = Transaction ((Month, Date), Payment)
 
 data Payment = Payment
+  { meta :: PaymentMeta
+  , core :: PaymentCore
+  }
+
+data PaymentMeta = PaymentMeta
   { _賃金計算期間 :: (Year, Month)
   , _労働日数 :: Int
   , _労働時間数 :: Hours
   , _休日労働時間数 :: Hours
   , _早出残業時間数 :: Hours
   , _深夜労働時間数 :: Hours
-  , _課税支給額 :: Amount
+  } deriving (Show, Read, Eq)
+
+data PaymentCore = PaymentCore
+  { _課税支給額 :: Amount
   , _非課税支給額 :: CreditCategory -> DateTransactions
   , _控除社会保険料 :: DebitCategory -> Amount -> DateTransactions
   , _所得税額 :: DebitCategory -> Amount -> DateTransactions
@@ -457,19 +475,19 @@ dummyCredit :: CreditCategory
 dummyCredit = CreditCategory $ Category "DUMMY!" Liabilities
 
 _算出保険料 :: Payment -> Amount
-_算出保険料 Payment {..} = sumAmounts $ _控除社会保険料 dummyDebit _課税支給額
+_算出保険料 (Payment _ PaymentCore {..}) = sumAmounts $ _控除社会保険料 dummyDebit _課税支給額
 
 _算出所得税 :: Payment -> Amount
-_算出所得税 payment@(Payment {..}) = sumAmounts $ _所得税額 dummyDebit (_課税支給額 - _算出保険料 payment)
+_算出所得税 payment@(Payment _ PaymentCore {..}) = sumAmounts $ _所得税額 dummyDebit (_課税支給額 - _算出保険料 payment)
 
 _非課税支給額総計 :: Payment -> Amount
-_非課税支給額総計 Payment {..} = sumAmounts $ _非課税支給額 dummyCredit
+_非課税支給額総計 (Payment _ PaymentCore {..}) = sumAmounts $ _非課税支給額 dummyCredit
 
 _その他控除総計 :: Payment -> Amount
-_その他控除総計 Payment {..} = sumAmounts $ _その他控除 dummyDebit
+_その他控除総計 (Payment _ PaymentCore {..}) = sumAmounts $ _その他控除 dummyDebit
 
 _実支払額 :: Payment -> Amount
-_実支払額 payment@(Payment {..}) = _課税支給額 - _算出保険料 payment - _算出所得税 payment - _その他控除総計 payment + _非課税支給額総計 payment
+_実支払額 payment@(Payment _ PaymentCore {..}) = _課税支給額 - _算出保険料 payment - _算出所得税 payment - _その他控除総計 payment + _非課税支給額総計 payment
 
 runDummyActivity :: DateTransactions -> Transaction Journal
 runDummyActivity = year 1 . month 1 . activity 1 ""
