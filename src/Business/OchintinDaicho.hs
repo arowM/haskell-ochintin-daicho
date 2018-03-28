@@ -19,8 +19,10 @@ module Business.OchintinDaicho
   -- * Usage examples
   -- $setup
 
+  -- * Constructors
+    datePayment
   -- * Types
-    Person(..)
+  , Person(..)
   , Payment(..)
   , Payments
   , Hours
@@ -46,26 +48,22 @@ import Business.Bookkeeping
   , DateTransactions
   , DebitCategory(..)
   , Month
-#if MIN_VERSION_bookkeeping(0,4,0)
   , Journal
-#else
-  , Transaction
-#endif
   , Transactions
   , Year
   , activity
   , dateTrans
   , month
-  , runTransactions
   , tAmount
   , year
   )
-import Control.Monad (forM_)
 import Data.Monoid ((<>))
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
+import Data.MonoTraversable (oforM_, osum)
 import Data.String (IsString(..))
+import Data.Transaction (Transaction, action, tMap)
 
 
 {- $setup
@@ -77,9 +75,9 @@ let
     { name = "山田 太郎"
     , sex = "男"
     , payments = \y -> case y of
-      2017 ->
-        [ ( (1, 10)
-          , Payment
+      2017 -> do
+        datePayment 1 10 $
+          Payment
             { _賃金計算期間 = (2016, 12)
             , _労働日数 = 13
             , _労働時間数 = 13 * 5
@@ -125,9 +123,8 @@ let
                 "親睦会費"
                 5000
             }
-          )
-        , ( (2, 10)
-          , Payment
+        datePayment 2 10 $
+          Payment
             { _賃金計算期間 = (2017, 1)
             , _労働日数 = 12
             , _労働時間数 = 12 * 5
@@ -173,10 +170,8 @@ let
                 "親睦会費"
                 5000
             }
-          )
-        ]
       _ ->
-        []
+        pure ()
     }
 :}
 -}
@@ -188,7 +183,7 @@ Amount {unAmount = 500000}
 -}
 _年度内課税支給金額 :: Person -> Year -> Amount
 _年度内課税支給金額 Person {..} =
-  sum . map (_課税支給額 . snd) . payments
+  osum . tMap (_課税支給額 . snd) . payments
 
 {-| 対象年度内の社会保険料等控除額総計
 
@@ -197,7 +192,7 @@ Amount {unAmount = 72000}
 -}
 _年度内社会保険控除額 :: Person -> Year -> Amount
 _年度内社会保険控除額 Person {..} =
-  sum . map (_算出保険料 . snd) . payments
+  osum . tMap (_算出保険料 . snd) . payments
 
 {-| 対象年度内の所得税控除額総計
 
@@ -206,7 +201,7 @@ Amount {unAmount = 10000}
 -}
 _年度内所得税控除額 :: Person -> Year -> Amount
 _年度内所得税控除額 Person {..} =
-  sum . map (_算出所得税 . snd) . payments
+  osum . tMap (_算出所得税 . snd) . payments
 
 {-| A pretty printer for payroll books.
 
@@ -258,7 +253,7 @@ ppr Person {..} y = do
     , "年支給分 =="
     ]
   T.putStrLn ""
-  forM_ (payments y) $ \((m, d), payment@(Payment {..})) -> do
+  oforM_ (payments y) $ \((m, d), payment@(Payment {..})) -> do
     let
       (targetYear, targetMonth) = _賃金計算期間
       _算出保険料' = _算出保険料 payment
@@ -392,7 +387,7 @@ tAmount: 208000
 toBookkeeping :: Person -> Year -> DebitCategory -> CreditCategory -> Transactions
 toBookkeeping Person {..} y debit credit =
   year y $
-    forM_ (payments y) $ \((m, d), payment@(Payment {..})) -> do
+    oforM_ (payments y) $ \((m, d), payment@(Payment {..})) -> do
       let
         (_, targetMonth) = _賃金計算期間
         _算出保険料' = _算出保険料 payment
@@ -408,6 +403,9 @@ toBookkeeping Person {..} y debit credit =
           _その他控除 debit
           dateTrans debit credit "給与支払い" _実支払額'
 
+datePayment :: Month -> Date -> Payment -> Payments
+datePayment m d p =
+  action ((m, d), p)
 
 {- ==============
  -     Types
@@ -423,7 +421,7 @@ data Person = Person
 
 {-| A type for handling `Payment` values.
  -}
-type Payments = [((Month, Date), Payment)]
+type Payments = Transaction ((Month, Date), Payment)
 
 data Payment = Payment
   { _賃金計算期間 :: (Year, Month)
@@ -459,23 +457,22 @@ dummyCredit :: CreditCategory
 dummyCredit = CreditCategory $ Category "DUMMY!" Liabilities
 
 _算出保険料 :: Payment -> Amount
-_算出保険料 Payment {..} = sum . map tAmount . runDummyActivity $ _控除社会保険料 dummyDebit _課税支給額
+_算出保険料 Payment {..} = sumAmounts $ _控除社会保険料 dummyDebit _課税支給額
 
 _算出所得税 :: Payment -> Amount
-_算出所得税 payment@(Payment {..}) = sum . map tAmount . runDummyActivity $ _所得税額 dummyDebit (_課税支給額 - _算出保険料 payment)
+_算出所得税 payment@(Payment {..}) = sumAmounts $ _所得税額 dummyDebit (_課税支給額 - _算出保険料 payment)
 
 _非課税支給額総計 :: Payment -> Amount
-_非課税支給額総計 Payment {..} = sum . map tAmount . runDummyActivity $ _非課税支給額 dummyCredit
+_非課税支給額総計 Payment {..} = sumAmounts $ _非課税支給額 dummyCredit
 
 _その他控除総計 :: Payment -> Amount
-_その他控除総計 Payment {..} = sum . map tAmount . runDummyActivity $ _その他控除 dummyDebit
+_その他控除総計 Payment {..} = sumAmounts $ _その他控除 dummyDebit
 
 _実支払額 :: Payment -> Amount
 _実支払額 payment@(Payment {..}) = _課税支給額 - _算出保険料 payment - _算出所得税 payment - _その他控除総計 payment + _非課税支給額総計 payment
 
-#if MIN_VERSION_bookkeeping(0,4,0)
-runDummyActivity :: DateTransactions -> [Journal]
-#else
-runDummyActivity :: DateTransactions -> [Transaction]
-#endif
-runDummyActivity = runTransactions . year 1 . month 1 . activity 1 ""
+runDummyActivity :: DateTransactions -> Transaction Journal
+runDummyActivity = year 1 . month 1 . activity 1 ""
+
+sumAmounts :: DateTransactions -> Amount
+sumAmounts = osum . tMap tAmount . runDummyActivity
