@@ -24,6 +24,8 @@ module Business.OchintinDaicho
   -- * Types
   , Person(..)
   , Payment(..)
+  , PaymentCore(..)
+  , PaymentMeta(..)
   , Payments
   , Hours
 
