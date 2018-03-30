@@ -298,6 +298,13 @@ Business.Bookkeeping.ppr $ toBookkeeping taroYamada 2017
 :}
 tDay: 2017-01-10
 tDescription: 12月度
+tSubDescription: 給与支払い
+tDebit: 給与手当 (Expenses)
+tCredit: 普通預金 (Liabilities)
+tAmount: 204000
+<BLANKLINE>
+tDay: 2017-01-10
+tDescription: 12月度
 tSubDescription: 立替交通費
 tDebit: 旅費・交通費 (Expenses)
 tCredit: 普通預金 (Liabilities)
@@ -338,12 +345,12 @@ tDebit: 給与手当 (Expenses)
 tCredit: 預り金 (Liabilities)
 tAmount: 5000
 <BLANKLINE>
-tDay: 2017-01-10
-tDescription: 12月度
+tDay: 2017-02-10
+tDescription: 1月度
 tSubDescription: 給与支払い
 tDebit: 給与手当 (Expenses)
 tCredit: 普通預金 (Liabilities)
-tAmount: 207000
+tAmount: 204000
 <BLANKLINE>
 tDay: 2017-02-10
 tDescription: 1月度
@@ -387,13 +394,6 @@ tDebit: 給与手当 (Expenses)
 tCredit: 預り金 (Liabilities)
 tAmount: 5000
 <BLANKLINE>
-tDay: 2017-02-10
-tDescription: 1月度
-tSubDescription: 給与支払い
-tDebit: 給与手当 (Expenses)
-tCredit: 普通預金 (Liabilities)
-tAmount: 208000
-<BLANKLINE>
 
 -}
 toBookkeeping :: Person -> Year -> DebitCategory -> CreditCategory -> Transactions
@@ -403,17 +403,17 @@ toBookkeeping Person {..} y debit credit =
       let
         (_, targetMonth) = _賃金計算期間
         _算出保険料' = _算出保険料 payment
-        _算出所得税' = _算出所得税 payment
-        _非課税支給額総計' = _非課税支給額総計 payment
-        _その他控除総計' = _その他控除総計 payment
-        _実支払額' = _実支払額 payment
       month m $
         activity d (fromString $ (show . toInteger) targetMonth <> "月度") $ do
+          dateTrans debit credit "給与支払い" $
+            _課税支給額
+            - _算出保険料'
+            - _算出所得税 payment
+            - _その他控除総計 payment
           _非課税支給額 credit
           _控除社会保険料 debit _課税支給額
           _所得税額 debit (_課税支給額 - _算出保険料')
           _その他控除 debit
-          dateTrans debit credit "給与支払い" _実支払額'
 
 datePayment :: Month -> Date -> Payment -> Payments
 datePayment m d p =
