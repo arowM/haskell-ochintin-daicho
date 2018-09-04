@@ -75,6 +75,12 @@ let
   taroYamada :: Person
   taroYamada = Person
     { name = "山田 太郎"
+    , birthday = "昭和60年1月1日"
+    , address = "東京都新宿区"
+    , job = "エンジニア"
+    , left = ""
+    , reason = ""
+    , history = ""
     , sex = "男"
     , payments = \y -> case y of
       2017 -> do
@@ -424,10 +430,17 @@ datePayment m d p =
  - ============== -}
 
 {-| Main data type to represent payroll books for a person.
+ - It can be also used as a 労働者名簿
  -}
 data Person = Person
-  { name :: Text
-  , sex :: Text
+  { name :: Text  -- 氏名
+  , birthday :: Text  -- 生年月日
+  , sex :: Text   -- 性別
+  , address :: Text -- 住所
+  , job :: Text   -- 業務の種類
+  , left :: Text  -- 退職または死亡年月日
+  , reason :: Text  -- 退職または死亡の理由
+  , history :: Text   -- 履歴
   , payments :: Year -> Payments
   }
 
