@@ -13,8 +13,9 @@ Portability :  unknown
 This module exports core functions and types for payroll books.
 -}
 module Business.OchintinDaicho.Person
+  (
   -- * Pretty printers
-  ( ppr
+    ppr
   , markdown
   ) where
 
