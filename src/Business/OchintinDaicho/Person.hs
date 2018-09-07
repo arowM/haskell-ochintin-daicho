@@ -20,6 +20,7 @@ module Business.OchintinDaicho.Person
   ) where
 
 import Business.OchintinDaicho (Person(..))
+import Data.Monoid ((<>))
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
