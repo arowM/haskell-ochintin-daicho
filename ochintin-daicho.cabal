@@ -1,5 +1,5 @@
 name:                ochintin-daicho
-version:             0.3.4.1
+version:             0.3.4.2
 synopsis:            A module to manage payroll books for Japanese companies.
 description:
     A module to manage payroll books for Japanese companies. This enable to export data to tax withholding book, etc...
