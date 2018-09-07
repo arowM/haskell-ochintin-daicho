@@ -17,6 +17,7 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Business.OchintinDaicho
+                     , Business.OchintinDaicho.Person
   build-depends:       base >= 4.9 && < 5
                      , bookkeeping >= 0.4.0.1 && < 0.5
                      , mono-traversable >= 1.0.0.1 && < 1.1
